@@ -1,5 +1,3 @@
-local CFileName = "Cultivation Simulator"
-
 local player = game.Players.LocalPlayer
 
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GUI")
@@ -11,10 +9,6 @@ local textElement = levelInfo:WaitForChild("文本")
 -- Variable to control the loop dynamically
 local isTeleportEnabled = false
 local world = 61
-
-if isfile("Rayfield/Configurations/" .. CFileName .. ".rfld") then
-    loaded = LoadConfiguration(readfile("Rayfield/Configurations/" .. CFileName .. ".rfld"))
-end
 
 -- Function to run when significant movement is detected
 local function onTeleport()
