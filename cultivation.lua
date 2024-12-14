@@ -1,3 +1,5 @@
+local CFileName = "Cultivation Simulator"
+
 local player = game.Players.LocalPlayer
 
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GUI")
@@ -9,6 +11,10 @@ local textElement = levelInfo:WaitForChild("文本")
 -- Variable to control the loop dynamically
 local isTeleportEnabled = false
 local world = 61
+
+if isfile("Rayfield/Configurations/" .. CFileName .. ".rfld") then
+    loaded = LoadConfiguration(readfile("Rayfield/Configurations/" .. CFileName .. ".rfld"))
+end
 
 -- Function to run when significant movement is detected
 local function onTeleport()
@@ -54,7 +60,7 @@ local Window = Rayfield:CreateWindow({
     DisableRayfieldPrompts = true,
     ConfigurationSaving = {
         Enabled = true,
-        FileName = "Cultivation Simulator"
+        FileName = CFileName
      },
 })
  
@@ -62,10 +68,10 @@ local Tab = Window:CreateTab("Main Tab", 4483362458)
 
 local Input = Tab:CreateInput({
     Name = "World Selector",
-    CurrentValue = "61",
-    PlaceholderText = "",
+    CurrentValue = "",
+    PlaceholderText = "61",
     RemoveTextAfterFocusLost = false,
-    Flag = "Input1",
+    Flag = "WorldSelect",
     Callback = function(Text)
         local inputWorld = tonumber(Text)
         if inputWorld then
@@ -80,7 +86,7 @@ local Input = Tab:CreateInput({
 local Toggle = Tab:CreateToggle({
     Name = "Speed Farm",
     CurrentValue = false,
-    Flag = "Toggle1", -- Unique identifier for saving configurations
+    Flag = "FarmToggle", -- Unique identifier for saving configurations
     Callback = function(Value)
         -- Update the global control variable
         isTeleportEnabled = Value
