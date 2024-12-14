@@ -6,14 +6,13 @@ local battle = mainInterface:WaitForChild("战斗")
 local levelInfo = battle:WaitForChild("关卡信息")
 local textElement = levelInfo:WaitForChild("文本")
 
--- Variable to control the loop dynamically
+-- Variables to control the loop dynamically
 local isTeleportEnabled = false
+local checkVisibilityOnly = false
 local world = 61
 
 -- Function to run when significant movement is detected
 local function onTeleport()
-    -- print("Teleported to world", world)
-    -- Call the function to re-enter the world
     local args = {
         [1] = world -- Replace this with the world ID or parameter you need
     }
@@ -27,22 +26,27 @@ end
 
 -- Continuously monitor the player's position
 local function monitorTeleport()
-    onTeleport()
     while isTeleportEnabled do
-        -- Extract the current value from textElement.Text
-        local valueText = textElement.Text
-        if valueText and valueText:match("%d+/%d+") then
-            local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
-            
-            -- Check if the current value is 100
-            if currentValue and (currentValue > 95 or not levelInfo.Visible) then
+        if checkVisibilityOnly then
+            -- Only teleport if the text element is not visible
+            if not levelInfo.Visible then
                 onTeleport()
             end
-        elseif not levelInfo.Visible then
-            onTeleport()
+        else
+            -- Normal teleport logic
+            local valueText = textElement.Text
+            if valueText and valueText:match("%d+/%d+") then
+                local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
+
+                if currentValue and (currentValue > 94 or not levelInfo.Visible) then
+                    onTeleport()
+                end
+            elseif not levelInfo.Visible then
+                onTeleport()
+            end
         end
-        
-        wait(0.2) -- Check every 0.5 seconds
+
+        wait(0.2) -- Check every 0.2 seconds
     end
 end
 
@@ -55,15 +59,15 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {
         Enabled = true,
         FileName = CFileName
-     },
+    },
 })
- 
+
 local Tab = Window:CreateTab("Main Tab", 4483362458)
 
 local Input = Tab:CreateInput({
     Name = "World Selector",
     CurrentValue = "",
-    PlaceholderText = "61",
+    PlaceholderText = world,
     RemoveTextAfterFocusLost = false,
     Flag = "WorldSelect",
     Callback = function(Text)
@@ -75,20 +79,27 @@ local Input = Tab:CreateInput({
             warn("Invalid world ID entered. Please enter a valid number.")
         end
     end,
- })
+})
 
 local Toggle = Tab:CreateToggle({
     Name = "Speed Farm",
     CurrentValue = false,
     Flag = "FarmToggle", -- Unique identifier for saving configurations
     Callback = function(Value)
-        -- Update the global control variable
         isTeleportEnabled = Value
-
-        -- Start or stop the monitoring loop
         if isTeleportEnabled then
             coroutine.wrap(monitorTeleport)()
         end
+    end,
+})
+
+local VisibilityToggle = Tab:CreateToggle({
+    Name = "Enable Full Clears",
+    CurrentValue = false,
+    Flag = "VisibilityToggle", -- Unique identifier for saving configurations
+    Callback = function(Value)
+        checkVisibilityOnly = Value
+        print("Check Visibility Only mode:", checkVisibilityOnly)
     end,
 })
 
@@ -96,7 +107,7 @@ local Toggle = Tab:CreateToggle({
 local GC = getconnections or get_signal_cons
 if GC then
     print("Player Idle Disabled")
-    for i,v in pairs(GC(player.Idled)) do
+    for i, v in pairs(GC(player.Idled)) do
         if v["Disable"] then
             v["Disable"](v)
         elseif v["Disconnect"] then
