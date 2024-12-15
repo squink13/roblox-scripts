@@ -38,7 +38,7 @@ local function monitorTeleport()
             if valueText and valueText:match("%d+/%d+") then
                 local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
 
-                if currentValue and (currentValue > 94 or not levelInfo.Visible) then
+                if currentValue and (currentValue > 93 or not levelInfo.Visible) then
                     onTeleport()
                 end
             elseif not levelInfo.Visible then
@@ -100,6 +100,37 @@ local VisibilityToggle = Tab:CreateToggle({
     Callback = function(Value)
         checkVisibilityOnly = Value
         print("Check Visibility Only mode:", checkVisibilityOnly)
+    end,
+})
+
+local AutoProgressButton = Tab:CreateButton({
+    Name = "Auto Progress",
+    Callback = function()
+        print("Auto Progress Started")
+        
+        coroutine.wrap(function()
+            local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
+            print("Starting from World:", currentWorld)
+
+            while currentWorld <= 80 do
+                world = currentWorld
+                Input:Set(world)
+
+
+                onTeleport() -- Perform teleport to the current world
+                
+                if levelInfo then
+                    repeat
+                        wait(0.5)
+                    until not levelInfo.Visible
+                end
+
+                wait(0.5)
+                currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
+            end
+
+            print("Auto Progress Completed")
+        end)()
     end,
 })
 
