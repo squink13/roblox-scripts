@@ -100,7 +100,7 @@ local VisibilityToggle = Tab:CreateToggle({
     Callback = function(Value)
         checkVisibilityOnly = Value
         print("Check Visibility Only mode:", checkVisibilityOnly)
-    end,w
+    end,
 })
 
 local AutoProgressButton = Tab:CreateToggle({
