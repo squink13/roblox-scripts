@@ -1,4 +1,5 @@
 local player = game.Players.LocalPlayer
+local forwardDirection
 
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GUI")
 local mainInterface = gui:WaitForChild("主界面")
@@ -11,17 +12,41 @@ local isTeleportEnabled = false
 local checkVisibilityOnly = false
 local world = 61
 
+-- Store the forward direction when the script executes
+local function storeForwardDirection()
+    local camera = game.Workspace.CurrentCamera
+    if camera then
+        forwardDirection = camera.CFrame.LookVector.Unit -- Normalize the vector
+    end
+end
+
 -- Function to run when significant movement is detected
 local function onTeleport()
     local args = {
         [1] = world -- Replace this with the world ID or parameter you need
     }
 
+    -- Fire the server with initial teleport
     game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
         :FindFirstChild("\229\133\172\231\148\168")
         :FindFirstChild("\229\133\179\229\141\161")
         :FindFirstChild("\232\191\155\229\133\165\228\184\150\231\149\140\229\133\179\229\141\161")
         :FireServer(unpack(args))
+
+    -- Add a slight delay
+    task.wait(0.6)
+
+    -- Move the player in the stored forward direction
+    if forwardDirection then
+        local player = game.Players.LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = player.Character.HumanoidRootPart
+            -- Move forward using the stored forward direction
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 44 + Vector3.new(0, 5, 0)
+        end
+    else
+        warn("Forward direction not stored.")
+    end
 end
 
 -- Continuously monitor the player's position
@@ -155,5 +180,7 @@ else
         VirtualUser:ClickButton2(Vector2.new())
     end)
 end
+
+storeForwardDirection()
 
 Rayfield:LoadConfiguration()
