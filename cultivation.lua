@@ -16,7 +16,9 @@ local world = 61
 local function storeForwardDirection()
     local camera = game.Workspace.CurrentCamera
     if camera then
-        forwardDirection = camera.CFrame.LookVector.Unit -- Normalize the vector
+        local lookVector = camera.CFrame.LookVector
+        -- Ignore the Y (up/down) component to focus on horizontal movement
+        forwardDirection = Vector3.new(lookVector.X, 0, lookVector.Z).Unit -- Normalize the vector
     end
 end
 
@@ -42,7 +44,7 @@ local function onTeleport()
         if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             local humanoidRootPart = player.Character.HumanoidRootPart
             -- Move forward using the stored forward direction
-            humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 44 + Vector3.new(0, 50, 0)
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 44 + Vector3.new(0, 10, 0)
         end
     else
         warn("Forward direction not stored.")
