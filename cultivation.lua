@@ -73,7 +73,7 @@ local function monitorTeleport()
             else
                 local args = {
                     [1] = 1,
-                    [2] = game:GetService("Players").LocalPlayer.Character,
+                    [2] = player.Character,
                     [3] = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
                 }
                 
