@@ -100,11 +100,13 @@ local VisibilityToggle = Tab:CreateToggle({
     Callback = function(Value)
         checkVisibilityOnly = Value
         print("Check Visibility Only mode:", checkVisibilityOnly)
-    end,
+    end,w
 })
 
-local AutoProgressButton = Tab:CreateButton({
+local AutoProgressButton = Tab:CreateToggle({
     Name = "Auto Progress",
+    CurrentValue = false,
+    Flag = "AutoProgressToggle",
     Callback = function()
         print("Auto Progress Started")
         
@@ -112,7 +114,7 @@ local AutoProgressButton = Tab:CreateButton({
             local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
             print("Starting from World:", currentWorld)
 
-            while currentWorld <= 80 do
+            while currentWorld < 80 or Value do
                 world = currentWorld
                 Input:Set(world)
 
