@@ -67,6 +67,14 @@ local function monitorTeleport()
 
                 if currentValue and (currentValue > 93 or not levelInfo.Visible) then
                     onTeleport()
+                else
+                    local args = {
+                        [1] = 1,
+                        [2] = player.Character,
+                        [3] = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
+                    }
+                    
+                    game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182"):FindFirstChild("\229\133\172\231\148\168"):FindFirstChild("\230\138\128\232\131\189"):FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189"):FireServer(unpack(args))
                 end
             elseif not levelInfo.Visible then
                 onTeleport()
