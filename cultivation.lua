@@ -61,6 +61,18 @@ local function monitorTeleport()
             -- Only teleport if the text element is not visible
             if not levelInfo.Visible then
                 onTeleport()
+            elseif monsterClears then
+                local args = {
+                    [1] = 1,
+                    [2] = character,
+                    [3] = defaultAngle
+                }
+
+                game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
+                    :FindFirstChild("\229\133\172\231\148\168")
+                    :FindFirstChild("\230\138\128\232\131\189")
+                    :FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189")
+                    :FireServer(unpack(args))
             end
         else
             -- Normal teleport logic
@@ -88,7 +100,7 @@ local function monitorTeleport()
             end
         end
 
-        wait(0.5) -- Check every 0.2 seconds
+        wait(0.5)
     end
 end
 
