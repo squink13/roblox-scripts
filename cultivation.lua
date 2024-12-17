@@ -31,7 +31,6 @@ local function storeForwardDirection()
     end
 end
 
--- Function to run when significant movement is detected
 local function onTeleport()
     local currentTime = os.clock()
     if currentTime - lastTeleportTime < teleportCooldown then
@@ -78,7 +77,7 @@ local function monitorTeleport()
                 onTeleport()
             end
         end
-        task.wait(1) -- Reduced loop frequency
+        task.wait(1)
     end
     teleportRunning = false
 end
@@ -99,7 +98,7 @@ local function autoProgress()
 
             if levelInfo then
                 repeat
-                    task.wait(1) -- Reduced frequency
+                    task.wait(1)
                 until not levelInfo.Visible
             end
 
@@ -142,7 +141,7 @@ local Input = Tab:CreateInput({
     end,
 })
 
-local Toggle = Tab:CreateToggle({
+local FarmToggle = Tab:CreateToggle({
     Name = "Speed Farm",
     CurrentValue = false,
     Flag = "FarmToggle",
@@ -151,6 +150,25 @@ local Toggle = Tab:CreateToggle({
         if isTeleportEnabled then
             coroutine.wrap(monitorTeleport)()
         end
+    end,
+})
+
+local VisibilityToggle = Tab:CreateToggle({
+    Name = "Enable Full Clears",
+    CurrentValue = false,
+    Flag = "VisibilityToggle", -- Unique identifier for saving configurations
+    Callback = function(Value)
+        checkVisibilityOnly = Value
+        print("Check Visibility Only mode:", checkVisibilityOnly)
+    end,
+})
+local MonsterClearsToggle = Tab:CreateToggle({
+    Name = "Enable Speed Monster Clears",
+    CurrentValue = false,
+    Flag = "MonsterClearsToggle", -- Unique identifier for saving configurations
+    Callback = function(Value)
+        monsterClears = Value
+        print("Monster clear mode:", monsterClears)
     end,
 })
 
