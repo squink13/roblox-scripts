@@ -1,5 +1,6 @@
-local player = game.Players.LocalPlayer
-local character = player.Character
+local player = game:GetService("Players").LocalPlayer or game:GetService("Players"):WaitForChild("LocalPlayer")
+repeat wait() until player.Character
+local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character.HumanoidRootPart
 local forwardDirection
 local defaultAngle = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
