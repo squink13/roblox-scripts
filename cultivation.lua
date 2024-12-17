@@ -67,7 +67,7 @@ local function monitorTeleport()
             if valueText and valueText:match("%d+/%d+") then
                 local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
 
-                if currentValue and (currentValue > 92 or not levelInfo.Visible) then
+                if currentValue and (currentValue > 91 or not levelInfo.Visible) then
                     onTeleport()
                 else if monsterClears then
                     local args = {
