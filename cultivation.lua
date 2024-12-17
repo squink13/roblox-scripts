@@ -1,5 +1,8 @@
 local player = game.Players.LocalPlayer
+local character = player.Character
+local humanoidRootPart = character.HumanoidRootPart
 local forwardDirection
+local defaultAngle = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
 
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GUI")
 local mainInterface = gui:WaitForChild("主界面")
@@ -10,6 +13,7 @@ local textElement = levelInfo:WaitForChild("文本")
 -- Variables to control the loop dynamically
 local isTeleportEnabled = false
 local checkVisibilityOnly = false
+local monsterClears = false
 local world = 61
 
 -- Store the forward direction when the script executes
@@ -35,19 +39,17 @@ local function onTeleport()
         :FindFirstChild("\232\191\155\229\133\165\228\184\150\231\149\140\229\133\179\229\141\161")
         :FireServer(unpack(args))
 
-    -- Add a slight delay
-    task.wait(0.6)
+    if monsterClears then
+        task.wait(0.6)
 
-    -- Move the player in the stored forward direction
-    if forwardDirection then
-        local player = game.Players.LocalPlayer
-        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local humanoidRootPart = player.Character.HumanoidRootPart
-            -- Move forward using the stored forward direction
-            humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 45 + Vector3.new(0, 2, 0)
+        -- Move the player in the stored forward direction
+        if forwardDirection then
+            if player and character then
+                humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 45 + Vector3.new(0, 2, 0)
+            end
+        else
+            warn("Forward direction not stored.")
         end
-    else
-        warn("Forward direction not stored.")
     end
 end
 
@@ -65,31 +67,27 @@ local function monitorTeleport()
             if valueText and valueText:match("%d+/%d+") then
                 local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
 
-                if currentValue and (currentValue > 93 or not levelInfo.Visible) then
+                if currentValue and (currentValue > 92 or not levelInfo.Visible) then
                     onTeleport()
-                else
+                else if monsterClears then
                     local args = {
                         [1] = 1,
-                        [2] = player.Character,
-                        [3] = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
+                        [2] = character,
+                        [3] = defaultAngle
                     }
-                    
-                    game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182"):FindFirstChild("\229\133\172\231\148\168"):FindFirstChild("\230\138\128\232\131\189"):FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189"):FireServer(unpack(args))
+
+                    game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
+                        :FindFirstChild("\229\133\172\231\148\168")
+                        :FindFirstChild("\230\138\128\232\131\189")
+                        :FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189")
+                        :FireServer(unpack(args))
                 end
             elseif not levelInfo.Visible then
                 onTeleport()
-            else
-                local args = {
-                    [1] = 1,
-                    [2] = player.Character,
-                    [3] = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
-                }
-                
-                game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182"):FindFirstChild("\229\133\172\231\148\168"):FindFirstChild("\230\138\128\232\131\189"):FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189"):FireServer(unpack(args))
             end
         end
 
-        wait(0.2) -- Check every 0.2 seconds
+        wait(0.5) -- Check every 0.2 seconds
     end
 end
 
@@ -146,7 +144,17 @@ local VisibilityToggle = Tab:CreateToggle({
     end,
 })
 
-local AutoProgressButton = Tab:CreateToggle({
+local MonsterClearsToggle = Tab:CreateToggle({
+    Name = "Enable Speed Monster Clears",
+    CurrentValue = false,
+    Flag = "MonsterClearsToggle", -- Unique identifier for saving configurations
+    Callback = function(Value)
+        monsterClears = Value
+        print("Monster clear mode:", monsterClears)
+    end,
+})
+
+local AutoProgressToggle = Tab:CreateToggle({
     Name = "Auto Progress",
     CurrentValue = false,
     Flag = "AutoProgressToggle",
@@ -202,3 +210,4 @@ end
 storeForwardDirection()
 
 Rayfield:LoadConfiguration()
+Input:Set(world)
