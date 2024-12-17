@@ -70,7 +70,7 @@ local function monitorTeleport()
 
                 if currentValue and (currentValue > 91 or not levelInfo.Visible) then
                     onTeleport()
-                else if monsterClears then
+                elseif monsterClears then
                     local args = {
                         [1] = 1,
                         [2] = character,
