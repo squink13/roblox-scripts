@@ -40,17 +40,15 @@ local function onTeleport()
         :FindFirstChild("\232\191\155\229\133\165\228\184\150\231\149\140\229\133\179\229\141\161")
         :FireServer(unpack(args))
 
-    if monsterClears then
         task.wait(0.8)
 
-        -- Move the player in the stored forward direction
-        if forwardDirection then
-            if player and character then
-                humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 46 + Vector3.new(0, 2, 0)
-            end
-        else
-            warn("Forward direction not stored.")
+    -- Move the player in the stored forward direction
+    if forwardDirection then
+        if player and character then
+            humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 46 + Vector3.new(0, 2, 0)
         end
+    else
+        warn("Forward direction not stored.")
     end
 end
 
