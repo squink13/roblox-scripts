@@ -15,7 +15,7 @@ local textElement = levelInfo:WaitForChild("文本")
 local isTeleportEnabled = false
 local checkVisibilityOnly = false
 local monsterClears = false
-local world = 80
+local world = 61
 
 -- Store the forward direction when the script executes
 local function storeForwardDirection()
@@ -200,30 +200,25 @@ local AutoProgressToggle = Tab:CreateToggle({
     end,
 })
 
-local AntiAfkButton = Tab:CreateButton({
-    Name = "Anti-AFK",
-    Callback = function()
-        -- anti afk
-        local GC = getconnections or get_signal_cons
-        if GC then
-            print("Player Idle Disabled")
-            for i, v in pairs(GC(player.Idled)) do
-                if v["Disable"] then
-                    v["Disable"](v)
-                elseif v["Disconnect"] then
-                    v["Disconnect"](v)
-                end
-            end
-        else
-            print("Clicked button")
-            local VirtualUser = cloneref(game:GetService("VirtualUser"))
-            player.Idled:Connect(function()
-                VirtualUser:CaptureController()
-                VirtualUser:ClickButton2(Vector2.new())
-            end)
+-- anti afk
+local GC = getconnections or get_signal_cons
+if GC then
+    print("Player Idle Disabled")
+    for i, v in pairs(GC(player.Idled)) do
+        if v["Disable"] then
+            v["Disable"](v)
+        elseif v["Disconnect"] then
+            v["Disconnect"](v)
         end
-    end,
-})
+    end
+else
+    print("Clicked button")
+    local VirtualUser = cloneref(game:GetService("VirtualUser"))
+    player.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+end
 
 storeForwardDirection()
 
