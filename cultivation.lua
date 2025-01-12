@@ -15,7 +15,7 @@ local textElement = levelInfo:WaitForChild("文本")
 local isTeleportEnabled = false
 local checkVisibilityOnly = false
 local monsterClears = false
-local world = 61
+local world = 80
 
 -- Store the forward direction when the script executes
 local function storeForwardDirection()
