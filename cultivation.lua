@@ -15,7 +15,24 @@ local textElement = levelInfo:WaitForChild("文本")
 local isTeleportEnabled = false
 local checkVisibilityOnly = false
 local monsterClears = false
-local world = 80
+local world = 86
+local autoRejoinEnabled = false
+
+-- Function to rejoin the server
+local function rejoinServer()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
+end
+
+-- Function to enable hourly rejoining
+local function autoRejoinLoop()
+    while autoRejoinEnabled do
+        wait(3600) -- Waits for 1 hour
+        if autoRejoinEnabled then
+            print("Rejoining server...")
+            rejoinServer()
+        end
+    end
+end
 
 -- Store the forward direction when the script executes
 local function storeForwardDirection()
@@ -197,6 +214,26 @@ local AutoProgressToggle = Tab:CreateToggle({
 
             print("Auto Progress Completed")
         end)()
+    end,
+})
+
+local RejoinToggle = Tab:CreateToggle({
+    Name = "Auto Rejoin (Every Hour)",
+    CurrentValue = false,
+    Flag = "AutoRejoinToggle",
+    Callback = function(Value)
+        autoRejoinEnabled = Value
+        if autoRejoinEnabled then
+            coroutine.wrap(autoRejoinLoop)()
+        end
+    end,
+})
+
+local RejoinButton = Tab:CreateButton({
+    Name = "Rejoin Server",
+    Callback = function()
+        print("Rejoining server...")
+        rejoinServer()
     end,
 })
 
