@@ -1,164 +1,263 @@
--- Configuration
-local world = 86
-local autoProgressWorld = 80
-local maxWave = 91
-local rejoinInterval = 7200
-local isTeleportEnabled = false
-local checkVisibilityOnly = false
-local autoRejoinEnabled = false
-local autoProgressEnabled = false
-
--- Services
 local player = game.Players.LocalPlayer
+repeat wait() until player.Character
+local character = player.Character
+local humanoidRootPart = character.HumanoidRootPart
+local forwardDirection
+local defaultAngle = CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0)
 
--- UI Elements
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GUI")
-local battle = gui:WaitForChild("主界面"):WaitForChild("战斗")
+local mainInterface = gui:WaitForChild("主界面")
+local battle = mainInterface:WaitForChild("战斗")
 local levelInfo = battle:WaitForChild("关卡信息")
 local textElement = levelInfo:WaitForChild("文本")
 
--- RemoteEvent References
-local repStorage = game:GetService("ReplicatedStorage")
-local teleportRemote
+-- Variables to control the loop dynamically
+local isTeleportEnabled = false
+local checkVisibilityOnly = false
+local monsterClears = false
+local world = 87
+local autoRejoinEnabled = false
 
+-- Function to rejoin the server
 local function rejoinServer()
     game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
 end
 
+-- Function to enable hourly rejoining
 local function autoRejoinLoop()
     while autoRejoinEnabled do
-        wait(rejoinInterval)
+        wait(7200) -- Waits for 1 hour
         if autoRejoinEnabled then
+            print("Rejoining server...")
             rejoinServer()
         end
     end
 end
 
-local function onTeleport()
-    if not teleportRemote then
-        teleportRemote = repStorage:WaitForChild("主公令"):WaitForChild("进入副本按钮")
+-- Store the forward direction when the script executes
+local function storeForwardDirection()
+    local camera = game.Workspace.CurrentCamera
+    if camera then
+        local lookVector = camera.CFrame.LookVector
+        -- Ignore the Y (up/down) component to focus on horizontal movement
+        forwardDirection = Vector3.new(lookVector.X, 0, lookVector.Z).Unit -- Normalize the vector
     end
-    teleportRemote:FireServer(world)
+end
+
+-- Function to run when significant movement is detected
+local function onTeleport()
+    local args = {
+        [1] = world -- Replace this with the world ID or parameter you need
+    }
+
+    -- Fire the server with initial teleport
+    game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
+        :FindFirstChild("\229\133\172\231\148\168")
+        :FindFirstChild("\229\133\179\229\141\161")
+        :FindFirstChild("\232\191\155\229\133\165\228\184\150\231\149\140\229\133\179\229\141\161")
+        :FireServer(unpack(args))
+
+    if monsterClears then    
+        task.wait(0.8)
+
+        -- Move the player in the stored forward direction
+        if forwardDirection then
+            if player and character then
+                humanoidRootPart.CFrame = humanoidRootPart.CFrame + forwardDirection * 46 + Vector3.new(0, 2, 0)
+            end
+        else
+            warn("Forward direction not stored.")
+        end
+    end
 end
 
 -- Continuously monitor the player's position
 local function monitorTeleport()
     while isTeleportEnabled do
-        local shouldTeleport = false
-
         if checkVisibilityOnly then
-            shouldTeleport = not levelInfo.Visible
-        else
-            local valueText = textElement.Text
-            local currentValue = valueText:match("%d+/%d+") and tonumber(valueText:match("(%d+)/%d+"))
-            shouldTeleport = (currentValue and currentValue > maxWave) or not levelInfo.Visible
-        end
+            -- Only teleport if the text element is not visible
+            if not levelInfo.Visible then
+                onTeleport()
+            elseif monsterClears then
+                local args = {
+                    [1] = 1,
+                    [2] = character,
+                    [3] = defaultAngle
+                }
 
-        if shouldTeleport then
-            onTeleport()
+                game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
+                    :FindFirstChild("\229\133\172\231\148\168")
+                    :FindFirstChild("\230\138\128\232\131\189")
+                    :FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189")
+                    :FireServer(unpack(args))
+            end
+        else
+            -- Normal teleport logic
+            local valueText = textElement.Text
+            if valueText and valueText:match("%d+/%d+") then
+                local currentValue = tonumber(valueText:match("%d+/%d+"):match("(%d+)/%d+"))
+
+                if currentValue and (currentValue > 91 or not levelInfo.Visible) then
+                    onTeleport()
+                elseif monsterClears then
+                    local args = {
+                        [1] = 1,
+                        [2] = character,
+                        [3] = defaultAngle
+                    }
+
+                    game:GetService("ReplicatedStorage"):FindFirstChild("\228\186\139\228\187\182")
+                        :FindFirstChild("\229\133\172\231\148\168")
+                        :FindFirstChild("\230\138\128\232\131\189")
+                        :FindFirstChild("\228\189\191\231\148\168\230\138\128\232\131\189")
+                        :FireServer(unpack(args))
+                end
+            elseif not levelInfo.Visible then
+                onTeleport()
+            end
         end
 
         wait(0.5)
     end
 end
 
-local function autoProgressLoop()
-    while autoProgressEnabled do
-        local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
-        if currentWorld >= autoProgressWorld then break end
-        
-        world = currentWorld
-        onTeleport()
-        
-        if levelInfo.Visible then
-            repeat task.wait(0.5) until not levelInfo.Visible
-        end
-        
-        task.wait(0.5)
-    end
-end
-
--- Rayfield UI
+-- Rayfield Integration
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
 local Window = Rayfield:CreateWindow({
     Name = "Cultivation Simulator",
     DisableRayfieldPrompts = true,
-    ConfigurationSaving = {Enabled = true}
+    ConfigurationSaving = {
+        Enabled = true,
+        FileName = CFileName
+    },
 })
 
 local Tab = Window:CreateTab("Main Tab", 4483362458)
 
-Tab:CreateInput({
+local Input = Tab:CreateInput({
     Name = "World Selector",
     CurrentValue = "",
-    PlaceholderText = tostring(world),
+    PlaceholderText = world,
+    RemoveTextAfterFocusLost = false,
     Flag = "WorldSelect",
     Callback = function(Text)
         local inputWorld = tonumber(Text)
-        world = inputWorld or world
+        if inputWorld then
+            world = inputWorld
+            print("Selected World ID updated to:", world)
+        else
+            warn("Invalid world ID entered. Please enter a valid number.")
+        end
     end,
 })
 
-Tab:CreateToggle({
+local Toggle = Tab:CreateToggle({
     Name = "Speed Farm",
-    Flag = "FarmToggle",
+    CurrentValue = false,
+    Flag = "FarmToggle", -- Unique identifier for saving configurations
     Callback = function(Value)
         isTeleportEnabled = Value
-        if Value then coroutine.wrap(monitorTeleport)() end
+        if isTeleportEnabled then
+            coroutine.wrap(monitorTeleport)()
+        end
     end,
 })
 
-Tab:CreateToggle({
+local VisibilityToggle = Tab:CreateToggle({
     Name = "Enable Full Clears",
-    Flag = "VisibilityToggle",
+    CurrentValue = false,
+    Flag = "VisibilityToggle", -- Unique identifier for saving configurations
     Callback = function(Value)
         checkVisibilityOnly = Value
+        print("Check Visibility Only mode:", checkVisibilityOnly)
     end,
 })
 
-Tab:CreateToggle({
+local MonsterClearsToggle = Tab:CreateToggle({
+    Name = "Enable Speed Monster Clears",
+    CurrentValue = false,
+    Flag = "MonsterClearsToggle", -- Unique identifier for saving configurations
+    Callback = function(Value)
+        monsterClears = Value
+        print("Monster clear mode:", monsterClears)
+    end,
+})
+
+local AutoProgressToggle = Tab:CreateToggle({
     Name = "Auto Progress",
+    CurrentValue = false,
     Flag = "AutoProgressToggle",
     Callback = function()
-        autoProgressEnabled = Value
-        if Value then coroutine.wrap(autoProgressLoop)() end
+        print("Auto Progress Started")
+        
+        coroutine.wrap(function()
+            local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
+            print("Starting from World:", currentWorld)
+
+            while currentWorld < 80 or Value do
+                world = currentWorld
+                Input:Set(world)
+
+
+                onTeleport() -- Perform teleport to the current world
+                
+                if levelInfo then
+                    repeat
+                        wait(0.5)
+                    until not levelInfo.Visible
+                end
+
+                wait(0.5)
+                currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
+            end
+
+            print("Auto Progress Completed")
+        end)()
     end,
 })
 
-Tab:CreateToggle({
-    Name = "Auto Rejoin",
+local RejoinToggle = Tab:CreateToggle({
+    Name = "Auto Rejoin (Every Hour)",
+    CurrentValue = false,
     Flag = "AutoRejoinToggle",
     Callback = function(Value)
         autoRejoinEnabled = Value
-        if Value then coroutine.wrap(autoRejoinLoop)() end
+        if autoRejoinEnabled then
+            coroutine.wrap(autoRejoinLoop)()
+        end
     end,
 })
 
-Tab:CreateButton({
+local RejoinButton = Tab:CreateButton({
     Name = "Rejoin Server",
-    Callback = rejoinServer,
+    Callback = function()
+        print("Rejoining server...")
+        rejoinServer()
+    end,
 })
 
--- Anti-AFK
-local function antiAFK()
-    local VirtualUser = game:GetService("VirtualUser")
-    local function captureController()
+-- anti afk
+local GC = getconnections or get_signal_cons
+if GC then
+    print("Player Idle Disabled")
+    for i, v in pairs(GC(player.Idled)) do
+        if v["Disable"] then
+            v["Disable"](v)
+        elseif v["Disconnect"] then
+            v["Disconnect"](v)
+        end
+    end
+else
+    print("Clicked button")
+    local VirtualUser = cloneref(game:GetService("VirtualUser"))
+    player.Idled:Connect(function()
         VirtualUser:CaptureController()
         VirtualUser:ClickButton2(Vector2.new())
-    end
-    
-    local success, _ = pcall(function()
-        for _, connection in pairs(getconnections(player.Idled)) do
-            if connection.Disable then connection:Disable()
-            elseif connection.Disconnect then connection:Disconnect() end
-        end
     end)
-    
-    if not success then
-        player.Idled:Connect(captureController)
-    end
 end
 
--- Initialize
-antiAFK()
+storeForwardDirection()
+
 Rayfield:LoadConfiguration()
+Input:Set(world)
