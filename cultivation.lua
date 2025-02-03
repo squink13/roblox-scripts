@@ -19,9 +19,8 @@ local textElement = levelInfo:WaitForChild("文本")
 
 -- RemoteEvent References
 local repStorage = game:GetService("ReplicatedStorage")
-local commonRemote = repStorage:WaitForChild("主公令")
-local teleportRemote = commonRemote:WaitForChild("进入副本按钮")
-local skillRemote = commonRemote:WaitForChild("技能"):WaitForChild("使用技能")
+local commonRemote = repStorage:FindFirstChild("主公令")
+local teleportRemote = commonRemote:FindFirstChild("进入副本按钮")
 
 local function rejoinServer()
     game:GetService("TeleportService"):Teleport(game.PlaceId, game:GetService("Players").LocalPlayer)
