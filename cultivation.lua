@@ -26,7 +26,7 @@ end
 -- Function to enable hourly rejoining
 local function autoRejoinLoop()
     while autoRejoinEnabled do
-        wait(7200) -- Waits for 1 hour
+        wait(10800)
         if autoRejoinEnabled then
             print("Rejoining server...")
             rejoinServer()
