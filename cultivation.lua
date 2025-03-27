@@ -195,7 +195,7 @@ local AutoProgressToggle = Tab:CreateToggle({
             local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
             print("Starting from World:", currentWorld)
 
-            while currentWorld < 80 or Value do
+            while currentWorld < 91 or Value do
                 world = currentWorld
                 Input:Set(world)
 
