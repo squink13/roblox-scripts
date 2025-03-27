@@ -199,9 +199,9 @@ local AutoProgressToggle = Tab:CreateToggle({
                 world = currentWorld
                 Input:Set(world)
 
-
+                print("Teleporting");
                 onTeleport() -- Perform teleport to the current world
-                
+                print("level info", levelInfo);
                 if levelInfo then
                     repeat
                         wait(0.5)
