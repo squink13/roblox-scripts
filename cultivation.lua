@@ -15,7 +15,7 @@ local textElement = levelInfo:WaitForChild("文本")
 local isTeleportEnabled = false
 local checkVisibilityOnly = false
 local monsterClears = false
-local world = 98
+local world = 99
 local autoRejoinEnabled = false
 
 -- Function to rejoin the server
@@ -195,7 +195,7 @@ local AutoProgressToggle = Tab:CreateToggle({
             local currentWorld = tonumber(player:WaitForChild("值"):WaitForChild("主线进度"):WaitForChild("世界").Value)
             print("Starting from World:", currentWorld)
 
-            while currentWorld < 98 or Value do
+            while currentWorld < 99 or Value do
                 world = currentWorld
                 Input:Set(world)
 
